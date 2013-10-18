@@ -41,13 +41,13 @@ class ConfigHandler(object):
         self.config = yaml.safe_load(config_text)
 
         # dehydrate questions
-        self.config['questions'] = map(
+        self.questions = map(
             self.parse_question, self.config.get('questions', [])
         )
-        self.config['outputs'] = map(
+        self.outputs = map(
             self.parse_output, self.config.get('outputs', [])
         )
-        self.config['last_run'] = last_run
+        self.last_run = last_run
 
     def parse_question(self, question):
         unit = question.values()[0].get('unit', 'number')
