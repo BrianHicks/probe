@@ -30,15 +30,18 @@ class LastRun(object):
 class ConfigHandler(object):
     @classmethod
     def from_paths(cls, config_path, last_run_path):
-        with open(config_path, 'r') as c:
-            config = c.read()
+        try:
+            with open(config_path, 'r') as c:
+                config = c.read()
+        except IOError:
+            config = ''
 
         last_run = LastRun(last_run_path)
 
         return cls(config, last_run)
 
     def __init__(self, config_text, last_run):
-        self.config = yaml.safe_load(config_text)
+        self.config = yaml.safe_load(config_text) or {}
 
         # dehydrate questions
         self.questions = map(

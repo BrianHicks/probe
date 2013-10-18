@@ -28,6 +28,11 @@ setup(
     packages=[
         'probe',
     ],
+    entry_points={
+        'console_scripts': [
+            'probe = probe.cli:main'
+        ]
+    },
     package_dir={'probe': 'probe'},
     include_package_data=True,
     install_requires=[
