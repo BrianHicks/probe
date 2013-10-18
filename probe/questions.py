@@ -49,7 +49,7 @@ class NumberQuestion(Question):
         try:
             ans = self.type(ans)
         except ValueError:
-            raise AnswerError('Could not parse "%r" as a %s' % (ans, self._type_name))
+            raise AnswerError('Could not parse %r as a(n) %s' % (ans, self._type_name))
 
         if self.lower and ans < self.lower:
             raise AnswerError(
@@ -94,9 +94,10 @@ class YesNoQuestion(Question):
         self.default = False
 
     def parse_answer(self, ans):
-        if ans.lower().startswith('y'):
+        lower = ans.lower()
+        if lower.startswith('t') or lower.startswith('y'):
             return True
-        elif ans.lower().startswith('f'):
+        elif lower.startswith('f') or lower.startswith('n'):
             return False
 
         try:

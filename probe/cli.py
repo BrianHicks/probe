@@ -7,6 +7,7 @@ import sys
 from textwrap import dedent
 
 from .config import ConfigHandler
+from .errors import AnswerError
 
 CONFIG_LOCATION = os.environ.get(
     'PROBE_CONFIG', os.path.expanduser('~/.probe_config')
@@ -28,6 +29,21 @@ class ProbeCLI(object):
             description='Initialize a new config in "%s" (WILL OVERWRITE)' % CONFIG_LOCATION
         )
         init.set_defaults(func=self.initialize)
+
+        answer = sub.add_parser(
+            'answer',
+            description='Answer the questions you have set up'
+        )
+        answer.set_defaults(func=self.answer)
+
+        for question in self.config.questions:
+            arg = answer.add_argument(
+                '--%s' % question.key,
+                metavar=question.key,
+                help=question.hint(),
+            )
+            if question.type != bool:
+                arg.type = question.type
 
     def run(self, args):
         args = self.parser.parse_args(args)
@@ -55,7 +71,36 @@ class ProbeCLI(object):
                         level: info
             ''').strip())
 
-        return args
+        return CONFIG_LOCATION
+
+    def answer(self, args):
+        # answer questions
+        answers = {}
+        for question in self.config.questions:
+            if getattr(args, question.key):
+                try:
+                    answers[question.key] = question.parse_answer(
+                        getattr(args, question.key)
+                    )
+                except AnswerError as err:
+                    print('Error in %s: %s' % (question.key, err))
+                    sys.exit(1)
+
+                continue
+
+            while question.key not in answers:
+                try:
+                    answer = raw_input(question.text + ' [' + question.hint() + '] ')
+                except (KeyboardInterrupt, EOFError):
+                    print('Interrupting. Bye!')
+                    sys.exit(1)
+
+                try:
+                    answers[question.key] = question.parse_answer(answer)
+                except AnswerError as err:
+                    print('Error: %s' % err)
+
+        print(answers)
 
 def main():
     ProbeCLI(ConfigHandler.from_paths(
