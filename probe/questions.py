@@ -51,12 +51,12 @@ class NumberQuestion(Question):
         except ValueError:
             raise AnswerError('Could not parse %r as a(n) %s' % (ans, self._type_name))
 
-        if self.lower and ans < self.lower:
+        if self.lower is not None and ans < self.lower:
             raise AnswerError(
                 '"%r" was lower than the lower bound, %r' % (ans, self.lower)
             )
 
-        if self.upper and ans > self.upper:
+        if self.upper is not None and ans > self.upper:
             raise AnswerError(
                 '"%r" was higher than the upper bound, %r' % (ans, self.upper)
             )
