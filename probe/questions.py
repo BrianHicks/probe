@@ -18,11 +18,11 @@ class Question(object):
 
     def hint(self):
         hint = 'default: %r' % self.default
-        if self.lower and self.upper:
+        if self.lower is not None and self.upper is not None:
             hint += ', range: %r to %r' % (self.lower, self.upper)
-        elif self.lower:
+        elif self.lower is not None:
             hint += ', lower: %r' % self.lower
-        elif self.upper:
+        elif self.upper is not None:
             hint += ', upper: %r' % self.upper
 
         return hint
@@ -38,8 +38,8 @@ class Question(object):
 class NumberQuestion(Question):
     def __init__(self, config):
         super(NumberQuestion, self).__init__(config)
-        self.converter = float
-        self._type = 'number'
+        self._type_name = 'number'
+        self.type = float
 
         self.lower = self.config.get('lower', None)
         self.upper = self.config.get('upper', None)
@@ -47,9 +47,9 @@ class NumberQuestion(Question):
 
     def parse_answer(self, ans):
         try:
-            ans = self.converter(ans)
+            ans = self.type(ans)
         except ValueError:
-            raise AnswerError('Could not parse "%r" as a %s' % (ans, self._type))
+            raise AnswerError('Could not parse "%r" as a %s' % (ans, self._type_name))
 
         if self.lower and ans < self.lower:
             raise AnswerError(
@@ -76,8 +76,8 @@ class RatingQuestion(NumberQuestion):
     def __init__(self, config):
         super(RatingQuestion, self).__init__(config)
 
-        self.converter = int
-        self._type = 'integer'
+        self.type = int
+        self._type_name = 'integer'
 
         self.lower = self.config.get('lower', 0)
         self.upper = self.config.get('upper', 10)
@@ -86,6 +86,8 @@ class RatingQuestion(NumberQuestion):
 class YesNoQuestion(Question):
     def __init__(self, config):
         super(YesNoQuestion, self).__init__(config)
+
+        self.type = bool
 
         self.upper = None
         self.lower = None
