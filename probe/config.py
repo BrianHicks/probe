@@ -5,6 +5,26 @@ import shelve
 import yaml
 
 from . import questions
+from . import outputs
+
+
+class LastRun(object):
+    def __init__(self, path):
+        store = shelve.open(path)
+        try:
+            self.last_run = store['last_run']
+        except KeyError:
+            self.last_run = datetime.fromtimestamp(0)
+        store.close()
+
+    def update(self, last_run):
+        self.last_run = last_run
+        store = shelve.open(path)
+        store['last_run'] = last_run
+        store.close()
+
+    def __repr__(self):
+        return '<%s: %s>' % (self.__class__.__name__, self.last_run)
 
 
 class ConfigHandler(object):
@@ -13,15 +33,7 @@ class ConfigHandler(object):
         with open(config_path, 'r') as c:
             config = c.read()
 
-        data = shelve.open(last_run_path)
-
-        try:
-            last_run = data['last_run']
-        except KeyError:
-            last_run = datetime.now()
-            data['last_run'] = last_run
-
-        data.close()
+        last_run = LastRun(last_run_path)
 
         return cls(config, last_run)
 
@@ -31,6 +43,9 @@ class ConfigHandler(object):
         # dehydrate questions
         self.config['questions'] = map(
             self.parse_question, self.config.get('questions', [])
+        )
+        self.config['outputs'] = map(
+            self.parse_output, self.config.get('outputs', [])
         )
         self.config['last_run'] = last_run
 
@@ -43,3 +58,10 @@ class ConfigHandler(object):
             'yesno': questions.YesNoQuestion,
         }
         return units[unit](question)
+
+    def parse_output(self, output):
+        key = output.keys()[0]
+
+        return {
+            'stdout': outputs.StdoutOutput,
+        }[key](**output.values()[0])
