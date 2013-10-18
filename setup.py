@@ -31,7 +31,9 @@ setup(
     package_dir={'probe': 'probe'},
     include_package_data=True,
     install_requires=[
-        "pyyaml==3.10"
+        "pyyaml==3.10",
+        "recurrent==0.2.4",
+        "python-dateutil==2.1",
     ],
     license="BSD",
     zip_safe=False,
