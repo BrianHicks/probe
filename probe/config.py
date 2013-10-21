@@ -10,21 +10,27 @@ from . import outputs
 
 class LastRun(object):
     def __init__(self, path):
+        self.path = path
         store = shelve.open(path)
-        try:
-            self.last_run = store['last_run']
-        except KeyError:
-            self.last_run = datetime.fromtimestamp(0)
-        store.close()
 
-    def update(self, last_run):
-        self.last_run = last_run
-        store = shelve.open(path)
-        store['last_run'] = last_run
-        store.close()
+    def last_run(self, key):
+        s = shelve.open(self.path)
+        try:
+            return s[key]
+        except KeyError:
+            return datetime.fromtimestamp(0)
+        finally:
+            s.close()
+
+    def update_last_run(self, key, value):
+        s = shelve.open(self.path)
+        try:
+            s[key] = value
+        finally:
+            s.close()
 
     def __repr__(self):
-        return '<%s: %s>' % (self.__class__.__name__, self.last_run)
+        return '<%s: %s>' % (self.__class__.__name__, self.path)
 
 
 class ConfigHandler(object):
