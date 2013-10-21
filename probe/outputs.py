@@ -26,8 +26,6 @@ class StdoutOutput(Output):
 
 class TempoDBOutput(Output):
     def __init__(self, **tempo_kwargs):
-        # imported here to make this optional
-        print tempo_kwargs
         self.client = Client(**tempo_kwargs)
 
     def __repr__(self):
