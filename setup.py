@@ -19,7 +19,7 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
     name='probe',
-    version='0.0.1',
+    version='0.0.2',
     description='Probe lets you ship personal metrics (feelings, energy level, productivity) to external services for analysis.',
     long_description=readme + '\n\n' + history,
     author='Brian Hicks',
