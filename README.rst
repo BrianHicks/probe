@@ -28,7 +28,7 @@ Features
 Getting Started
 ---------------
 
-Run ``probe init`` after installing. Then look at the "configuratione example"
+Run ``probe init`` after installing. Then look at the "configuration example"
 below. To anwer questions, run ``probe answer``.
 
 Configuration Example
