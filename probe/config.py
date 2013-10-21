@@ -18,7 +18,7 @@ class LastRun(object):
         try:
             return s[key]
         except KeyError:
-            return datetime.fromtimestamp(0)
+            return None
         finally:
             s.close()
 

@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 from argparse import ArgumentParser
+from datetime import datetime
+from dateutil.rrule import rrulestr
 import os
 import sys
 from textwrap import dedent
@@ -77,6 +79,13 @@ class ProbeCLI(object):
         # answer questions
         answers = {}
         for question in self.config.questions:
+            last_run = self.config.last_run.last_run(question.key)
+            if last_run is not None:
+                rule = rrulestr(question.interval, dtstart=last_run)
+                next_run = rule.after(last_run)
+                if next_run > datetime.now():
+                    continue
+
             if getattr(args, question.key):
                 try:
                     answers[question.key] = question.parse_answer(
@@ -100,7 +109,16 @@ class ProbeCLI(object):
                 except AnswerError as err:
                     print('Error: %s' % err)
 
-        print(answers)
+        if not answers:
+            print('No questions to answer right now. Check back later!')
+
+        for key, answer in answers.items():
+            for output in self.config.outputs:
+                output.send(key, answer)
+
+            self.config.last_run.update_last_run(key, datetime.now())
+
+        return answers
 
 def main():
     ProbeCLI(ConfigHandler.from_paths(
