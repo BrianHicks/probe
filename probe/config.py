@@ -73,4 +73,5 @@ class ConfigHandler(object):
 
         return {
             'stdout': outputs.StdoutOutput,
+            'tempodb': outputs.TempoDBOutput
         }[key](**output.values()[0])

@@ -40,6 +40,9 @@ setup(
         "recurrent==0.2.4",
         "python-dateutil==2.1",
     ],
+    extras_require={
+        'tempodb': ['tempodb'],
+    },
     license="BSD",
     zip_safe=False,
     keywords='probe',
