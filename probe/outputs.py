@@ -32,6 +32,9 @@ class TempoDBOutput(Output):
         return '<%s>' % self.__class__.__name__
 
     def send(self, key, value):
+        if isinstance(value, bool):
+            value = 1 if value else 0
+
         self.client.write_key(
             key,
             [DataPoint(datetime.now(), value)]
